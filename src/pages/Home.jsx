@@ -7,8 +7,8 @@ import DiaryList from '../components/DiaryList';
 
 const Home = () => {
     const data = useContext(DiaryStateContext);
-    const [pivotDate, setPivoDate] = useState(new Date());
     const headerTitle = `${pivotDate.getFullYear()}년 ${pivotDate.getMonth() + 1}월`;
+    const [pivotDate, setPivoDate] = useState(new Date());
     const [filteredData, setFilteredData] = useState([]);
 
     const onIncreaseMonth = () => {

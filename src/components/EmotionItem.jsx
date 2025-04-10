@@ -1,4 +1,4 @@
-import './EditiorItem.css';
+import './EmotionItem.css';
 
 const EmotionItem = ({ id, img, name, onClick, isSelected }) => {
 
