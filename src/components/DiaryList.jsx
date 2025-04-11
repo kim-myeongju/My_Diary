@@ -13,13 +13,13 @@ const DiaryList = ({ data }) => {
     const [sortedData, setSortedDate] = useState([]);
     const navigate = useNavigate();
 
-    const onChangeSortType = (e) => {
-        setSortType(e.target.value);
-    };
-
     const onClickNew = () => {
         navigate("/new");
     }
+
+    const onChangeSortType = (e) => {
+        setSortType(e.target.value);
+    };
 
     useEffect(() => {
         const compare = (a, b) => {
