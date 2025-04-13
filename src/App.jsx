@@ -19,7 +19,7 @@ const mockData = [
     id: 2,
     date: new Date().getTime() -2,
     content: "오잇",
-    emotionId: 5,
+    emotionId: 3,
   },
   {
     id: 3,
