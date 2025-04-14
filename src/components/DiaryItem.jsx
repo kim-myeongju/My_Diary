@@ -1,4 +1,5 @@
 import './DiaryItem.css';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEmotionImgById } from '../util';
 import Button from './Button';
@@ -36,4 +37,9 @@ const DiaryItem = ({ id, emotionId, content, date }) => {
     )
 }
 
-export default DiaryItem;
+/* 
+    최적화
+    DiaryItem 컴포넌트는 Context 에서 데이터를 받거나 Props 로 함수나 배열 같은 참조형 값을 받지 않기 때문에
+    React.memo 를 이용해 Props 를 기준으로 메모이제이션 함.
+*/
+export default React.memo(DiaryItem);

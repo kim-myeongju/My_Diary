@@ -1,6 +1,6 @@
 import { emotionList, getFormattedDate } from '../util';
 import './Editor.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import EmotionItem from './EmotionItem';
@@ -39,12 +39,14 @@ const Editor = ({ initData, onSubmit }) => {
         navigate(-1);
     }
     
-    const handleChangeEmotion = (emotionId) => {
-        setState({
+    // 최적화
+    // Editor 컴포넌트를 리렌더해도 함수 handleChangeEmotion 을 다시 생성하지 않도록 useCallback을 사용해서 메모이제이션하기
+    const handleChangeEmotion = useCallback((emotionId) => {
+        setState((state) => ({
             ...state,
             emotionId,
-        })
-    }
+        }));
+    }, []);
 
     useEffect(() => {
         if (initData) {
@@ -84,7 +86,7 @@ const Editor = ({ initData, onSubmit }) => {
             </div>
             <div className="editor_section btn_section">
                 <Button text={"취소하기"} onClick={handleOnGoBack} />
-                <Button text={"작성 완료"} type={"positive"} onClick={handleSubmit} />
+                <Button text={"작성완료"} type={"positive"} onClick={handleSubmit} />
             </div>
         </div>
     )

@@ -16,7 +16,7 @@ const useDiary = (id) => {
             navigate("/", { replace: true });
             // { replace: true }: Home으로 이동 후 뒤로가기 비활성화.
         }
-    }, [id, data]);
+    }, [id]);
 
     return diary;
 };
