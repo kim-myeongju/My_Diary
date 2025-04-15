@@ -22,22 +22,17 @@ function reducer(state, action) {
       nextState = [action.data, ...state];
       break;
     }
-      // return [action.data, ...state];
     case "UPDATE": {
-      nextState = state.map((item) => String(item.id) === String(action.data.id)? action.data : item);
+      nextState = state.map((item) => item.id === action.data.id? action.data : item);
       break;
     }
-      // return state.map((item) => String(item.id) === String(action.data.id)? action.data : item);
     case "DELETE": {
       nextState = state.filter((item) => String(item.id) !== String(action.id));
       break;
     }
-      // return state.filter((item) => String(item.id) !== String(action.id));
     default: 
       return state;
   }
-
-  // localStorage.setItem("diary", JSON.stringify(nextState));
 
   return nextState;
 }
@@ -48,76 +43,125 @@ export const DiaryDispatchContext = createContext();
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, dispatch] = useReducer(reducer, []);
-  const idRef = useRef(3);
 
   useEffect(() => {
-    const storedData = localStorage.getItem("diary");
-    if(!storedData) { // storedData가 undefined라면 리턴 !
-      return ;
-    }
-    const parsedData = JSON.parse(storedData);
+    const getAllDiary = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/diary");
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch diary data");
+        }
 
-    if(!Array.isArray(parsedData)) {
-      setIsLoading(false);
-      return ;
-    }
-
-    let maxId = 0;
-    parsedData.forEach((item) => {
-      if(Number(item.id) > maxId) {
-        maxId = Number(item.id);
+        // 서버에서 받아온 데이터로 상태 업데이트
+        const diaryData = await response.json();
+        
+        // 데이터를 reducer로 보냄
+        dispatch({
+          type: "INIT",
+          data: diaryData,
+        });
+        
+      } catch (error) {
+        console.error("Error fetching diaries:", error);
+      } finally {
+        setIsLoading(false); // 로딩 완료 후 false로 설정
       }
-    });
+    };
 
-    idRef.current = maxId + 1;
-
-    dispatch({
-      type: "INIT",
-      data: parsedData,
-    });
-    setIsLoading(false);
+    getAllDiary();
   }, []);
 
   // 새로운 일기 추가
   const onCreate = async (createdDate, emotionId, content) => {
     if (!createdDate.trim() || !content.trim()) return;
+    const diaryData = {
+      createdDate : new Date(createdDate).toISOString(),
+      emotionId: emotionId,
+      content: content,
+    };
+
+    console.log(createdDate);
 
     try {
-      const res = await axios.post('http://localhost:8080/api/mydiary', {createdDate, emotionId, content});
+      const response = await fetch('http://localhost:8080/diary', {
+        method: "POST",
+        body: JSON.stringify(diaryData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const resData = response;
 
       dispatch({
         type: "CREATE",
-        data: {
-          id: idRef.current++,
-          createdDate,
-          emotionId,
-          content,
-        },
+        data: resData,
       });
+
     } catch (err) {
       console.log("save fail: ", err);
     }
   };
 
   // 기존 일기 수정
-  const onUpdate = (id, createdDate, emotionId, content) => {
-    dispatch({
-      type: "UPDATE",
-      data: {
-        id,
-        createdDate,
-        emotionId,
-        content,
+  const onUpdate = async (id, createdDate, emotionId, content) => {
+    const updateDiary = {
+      id,
+      createdDate: new Date(createdDate).toISOString(),
+      emotionId: emotionId,
+      content: content,
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/diary/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(updateDiary),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if(!response.ok) {
+        throw new Error("update fail");
       }
-    })
+
+      const resData = await response.json();
+
+      dispatch({
+        type: "UPDATE",
+        data: {
+          id,
+          emotionId: content,
+        }
+      });
+
+    } catch(error) {
+      console.error("update request fail: ", error);
+    } finally {
+      console.error("update emotionId: ", emotionId);
+      console.error("update content: ", content);
+    }
   };
 
   // 기존 일기 삭제
-  const onDelete = (id) => {
-    dispatch({
-      type: "DELETE",
-      id,
-    })
+  const onDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/diary/${id}`, {
+        method: "DELETE",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch diary data");
+      }
+      
+      dispatch({
+        type: "DELETE",
+        id,
+      });
+      
+    } catch (error) {
+      console.error("Error fetching diaries:", error);
+    }
   };
 
   if(isLoading) {

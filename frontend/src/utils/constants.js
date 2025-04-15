@@ -1,22 +1,22 @@
 export const emotionList = [
     {
-        emotionId: 1,
+        emotionId: "1",
         emotionName: "very good",
     },
     {
-        emotionId: 2,
+        emotionId: "2",
         emotionName: "good",
     },
     {
-        emotionId: 3,
+        emotionId: "3",
         emotionName: "soso",
     },
     {
-        emotionId: 4,
+        emotionId: "4",
         emotionName: "bad",
     },
     {
-        emotionId: 5,
+        emotionId: "5",
         emotionName: "so bad",
     },
 ];

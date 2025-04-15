@@ -6,7 +6,6 @@ import React from "react";
 
 const DiaryItem = ({id, emotionId, createdDate, content}) => {
     const navigate = useNavigate();
-
     return (
         <div className="DiaryItem">
             <div onClick={() => navigate(`/diary/${id}`)} className={`img_section img_section_${emotionId}`}>

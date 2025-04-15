@@ -10,7 +10,14 @@ const getMonthlyData = (pivotDate, data) => {
     const beginTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth(), 1, 0, 0, 0).getTime();
     const endTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1, 0, 23, 59, 59).getTime();
 
-    return data.filter((item) => beginTime <= item.createdDate && item.createdDate <= endTime);
+    const diaryData = data.filter((diary) => {
+      
+        // 날짜 비교 (createdDate가 문자열이면 Date 객체로 바꿔줘야 해)
+        const diaryDate = new Date(diary.createdDate);
+        return beginTime <= diaryDate && diaryDate <= endTime;
+    });
+      
+    return diaryData;
 };
 
 const Home = () => {
@@ -19,6 +26,8 @@ const Home = () => {
     const monthlyData = getMonthlyData(pivotDate, data);
 
     usePageTitle("감정 일기장");
+
+    //console.log("monthlyData : " + monthlyData);
 
     const onIncreseMonth = () => {
         setPivotDate(new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1));

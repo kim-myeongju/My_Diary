@@ -9,4 +9,25 @@
         VALUES (#{emotionId}, #{createdDate}, #{content})
     </insert>
 
+    <select id="findAllDiary" resultType="diary">
+        select * from mydiary order by created_date desc
+    </select>
+
+    <select id="findDiaryById" resultType="diary">
+        select * from mydiary where id = #{id}
+    </select>
+
+    <update id="updateDiary" parameterType="diary">
+        update mydiary
+        <set>
+            <if test="emotionId != null">emotion_id = #{emotionId},</if>
+            <if test="content != null">content = #{content},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDiary">
+        delete from mydiary where id = #{id}
+    </delete>
+
 </mapper>

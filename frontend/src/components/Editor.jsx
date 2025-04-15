@@ -24,19 +24,19 @@ const Editor = ({initData, onSubmit}) => {
         }
     }, [initData]);
 
-    const onChangeInput = (e) => {
-        let name = e.target.name;
-        let value = e.target.value;
-
-        if(name === "createdDate") {
-            value = new Date(value);
-        }
-
-        setInput({
-            ...input,
-            [name]: value,
-        })
-    }
+    const onChangeInput = useCallback((e) => {
+            let name = e.target.name;
+            let value = e.target.value;
+    
+            if(name === "createdDate") {
+                value = new Date(value);
+            }
+    
+            setInput({
+                ...input,
+                [name]: value,
+            })
+        }, []);
 
     const onClickSubmitButton = () => {
         onSubmit(input);
