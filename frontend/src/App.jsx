@@ -6,6 +6,7 @@ import New from './pages/New';
 import Diary from './pages/Diary';
 import Edit from './pages/Edit';
 import NotFound from './pages/NotFound';
+import axios from 'axios';
 
 // 1. "/": 모든 일기를 조회하는 Home 페이지
 // 2. "/new": 새로운 일기를 작성하는 New 페이지
@@ -36,7 +37,7 @@ function reducer(state, action) {
       return state;
   }
 
-  localStorage.setItem("diary", JSON.stringify(nextState));
+  // localStorage.setItem("diary", JSON.stringify(nextState));
 
   return nextState;
 }
@@ -78,16 +79,24 @@ function App() {
   }, []);
 
   // 새로운 일기 추가
-  const onCreate = (createdDate, emotionId, content) => {
-    dispatch({
-      type: "CREATE",
-      data: {
-        id: idRef.current++,
-        createdDate,
-        emotionId,
-        content,
-      },
-    });
+  const onCreate = async (createdDate, emotionId, content) => {
+    if (!createdDate.trim() || !content.trim()) return;
+
+    try {
+      const res = await axios.post('http://localhost:8080/api/mydiary', {createdDate, emotionId, content});
+
+      dispatch({
+        type: "CREATE",
+        data: {
+          id: idRef.current++,
+          createdDate,
+          emotionId,
+          content,
+        },
+      });
+    } catch (err) {
+      console.log("save fail: ", err);
+    }
   };
 
   // 기존 일기 수정
