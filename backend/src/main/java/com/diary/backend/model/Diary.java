@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class Diary {
     Long id;
-    String emotionId;
     LocalDateTime createdDate;
+    Long emotionId;
     String content;
 }

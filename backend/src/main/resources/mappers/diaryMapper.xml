@@ -9,8 +9,14 @@
         VALUES (#{createdDate}, #{emotionId}, #{content})
     </insert>
 
-    <select id="findAllDiary" resultType="diary">
+    <!-- 최신순 -->
+    <select id="findAllDiaryDesc" resultType="diary">
         select * from mydiary order by created_date desc
+    </select>
+
+    <!-- 오래된순 -->
+    <select id="findAllDiary" resultType="diary">
+        select * from mydiary order by created_date
     </select>
 
     <select id="findDiaryById" resultType="diary">

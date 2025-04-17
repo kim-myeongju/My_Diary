@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface DiaryMapper {
     void saveDiary(Diary diary);
+    List<Diary> findAllDiaryDesc();
     List<Diary> findAllDiary();
     Diary findDiaryById(Long id);
     void updateDiary(Diary diary);
