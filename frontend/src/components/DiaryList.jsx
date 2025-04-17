@@ -12,16 +12,18 @@ const DiaryList = ({data}) => {
         setSortType(e.target.value);
     };
 
+    
     const getSortedDate = () => {
         return data.toSorted((a, b) => {
             if(sortType === 'oldest') {
+                // ** 이 부분도 백엔드 쪽에 정렬 쿼리 만든 메퍼 적용해서 구현완료되면 계산식은 삭제할 부분 - 리턴으로 백엔드 쪽 정보 리턴하도록??
                 return Number(a.createdDate) - Number(b.createdDate);
             } else {
+                // ** 이 부분도 백엔드 쪽에 정렬 쿼리 만든 메퍼 적용해서 구현완료되면 계산식은 삭제할 부분 - 리턴으로 백엔드 쪽 정보 리턴하도록??
                 return Number(b.createdDate) - Number(a.createdDate);
             }
         });
     };
-
     const sortData = getSortedDate();
 
     return (

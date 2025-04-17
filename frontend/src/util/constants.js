@@ -1,22 +1,22 @@
 export const emotionList = [
     {
         emotionId: 1,
-        emotionName: "완전 좋음",
+        emotionName: "very good",
     },
     {
         emotionId: 2,
-        emotionName: "좋음",
+        emotionName: "good",
     },
     {
         emotionId: 3,
-        emotionName: "보통",
+        emotionName: "soso",
     },
     {
         emotionId: 4,
-        emotionName: "별로",
+        emotionName: "bad",
     },
     {
         emotionId: 5,
-        emotionName: "완전 별로",
+        emotionName: "so bad",
     },
 ];

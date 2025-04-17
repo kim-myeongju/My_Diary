@@ -1,6 +1,6 @@
 import './App.css';
-import { useReducer, useRef, useContext, createContext, useEffect, useState } from 'react';
-import { Routes, Route, useSearchParams, useAsyncValue } from 'react-router-dom';
+import { useReducer, useRef, createContext, useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import New from './pages/New';
 import Diary from './pages/Diary';
@@ -48,6 +48,8 @@ function App() {
   // const [isLoading, setIsLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [data, dispatch] = useReducer(reducer, []);
+
+  // ** 백엔드 연동되면 삭제하기
   const idRef = useRef(3);
 
   // localStorage.setItem("test", 'hello');
@@ -73,13 +75,13 @@ function App() {
       return ;
     }
 
+    // ** 백엔드 연동되면 삭제하기
     let maxId = 0;
     parsedData.forEach((item) => {
       if(Number(item.id) > maxId) {
         maxId = Number(item.id);
       }
     });
-
     idRef.current = maxId + 1;
 
     dispatch({

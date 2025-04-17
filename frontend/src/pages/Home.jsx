@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import DiaryList from "../components/DiaryList";
 import usePageTitle from "../hooks/usePageTitle";
 
+// 해당 달에 작성된 일기들만 정렬렬
 const getMonthlyData = (pivotDate, data) => {
                             // (년도, 월, 그달의 시작날인 1일, 0시, 0분, 0초)
     const beginTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth(), 1, 0, 0, 0).getTime();

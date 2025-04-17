@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import Editor from "../components/Editor";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { DiaryStateContext, DiaryDisPatchContext } from "../App";
 import useDiary from "../hooks/useDiary";
 import usePageTitle from "../hooks/usePageTitle";
