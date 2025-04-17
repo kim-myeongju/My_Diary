@@ -5,8 +5,8 @@
 <mapper namespace="com.diary.backend.repository.DiaryMapper">
 
     <insert id="saveDiary">
-        INSERT INTO mydiary (emotion_id, created_date, content)
-        VALUES (#{emotionId}, #{createdDate}, #{content})
+        INSERT INTO mydiary (created_date, emotion_id, content)
+        VALUES (#{createdDate}, #{emotionId}, #{content})
     </insert>
 
     <select id="findAllDiary" resultType="diary">

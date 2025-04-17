@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -17,16 +19,19 @@ public class DiaryController {
 
     @PostMapping
     public ResponseEntity<String> save(@RequestBody Diary diary) {
+        System.out.println("diary data ==> " + diary);
+
         if (diary == null) {
             return ResponseEntity.status(400).body("save fail");
         }
 
-//        // createdDate가 null이면 현재 날짜로 설정
-//        if (diary.getCreatedDate() == null) {
-//            diary.setCreatedDate(LocalDateTime.now());
-//        }
+        // createdDate가 null이면 현재 날짜로 설정
+        if (diary.getCreatedDate() == null) {
+            diary.setCreatedDate(LocalDateTime.now());
+        }
 
         diaryMapper.saveDiary(diary);
+
         return ResponseEntity.ok("save success");
     }
 
@@ -47,6 +52,7 @@ public class DiaryController {
         Diary diaryById = diaryMapper.findDiaryById(id);
         diaryById.setEmotionId(diaryRequest.getEmotionId());
         diaryById.setContent(diaryRequest.getContent());
+        log.info("createdDate: {}", diaryRequest.getCreatedDate());
         log.info("emotionId: {}", diaryRequest.getEmotionId());
         log.info("content: {}", diaryRequest.getContent());
         diaryMapper.updateDiary(diaryById);

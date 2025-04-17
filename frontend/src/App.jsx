@@ -6,7 +6,6 @@ import New from './pages/New';
 import Diary from './pages/Diary';
 import Edit from './pages/Edit';
 import NotFound from './pages/NotFound';
-import axios from 'axios';
 
 // 1. "/": 모든 일기를 조회하는 Home 페이지
 // 2. "/new": 새로운 일기를 작성하는 New 페이지
@@ -22,146 +21,106 @@ function reducer(state, action) {
       nextState = [action.data, ...state];
       break;
     }
+      // return [action.data, ...state];
     case "UPDATE": {
-      nextState = state.map((item) => item.id === action.data.id? action.data : item);
+      nextState = state.map((item) => String(item.id) === String(action.data.id)? action.data : item);
       break;
     }
+      // return state.map((item) => String(item.id) === String(action.data.id)? action.data : item);
     case "DELETE": {
       nextState = state.filter((item) => String(item.id) !== String(action.id));
       break;
     }
+      // return state.filter((item) => String(item.id) !== String(action.id));
     default: 
       return state;
   }
+
+  localStorage.setItem("diary", JSON.stringify(nextState));
 
   return nextState;
 }
 
 export const DiaryStateContext = createContext();
-export const DiaryDispatchContext = createContext();
+export const DiaryDisPatchContext = createContext();
 
 function App() {
+  // const [isLoading, setIsLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [data, dispatch] = useReducer(reducer, []);
+  const idRef = useRef(3);
+
+  // localStorage.setItem("test", 'hello');
+  // localStorage.setItem("person", JSON.stringify({name: "송혜교"}));
+
+  // const test = localStorage.getItem("test");
+  // console.log(test);
+  // const person = localStorage.getItem("person");
+  // console.log(JSON.parse(person));
+
+  // localStorage.removeItem("test");
+  // localStorage.removeItem("person");   // 브라우저 어플리케이션에서 삭제할 데이터를 클릭하고 backspace 눌러도 삭제
 
   useEffect(() => {
-    const getAllDiary = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/diary");
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch diary data");
-        }
+    const storedData = localStorage.getItem("diary");
+    if(!storedData) { // storedData가 undefined라면 리턴 !
+      return ;
+    }
+    const parsedData = JSON.parse(storedData);
 
-        // 서버에서 받아온 데이터로 상태 업데이트
-        const diaryData = await response.json();
-        
-        // 데이터를 reducer로 보냄
-        dispatch({
-          type: "INIT",
-          data: diaryData,
-        });
-        
-      } catch (error) {
-        console.error("Error fetching diaries:", error);
-      } finally {
-        setIsLoading(false); // 로딩 완료 후 false로 설정
+    if(!Array.isArray(parsedData)) {
+      setIsLoading(false);
+      return ;
+    }
+
+    let maxId = 0;
+    parsedData.forEach((item) => {
+      if(Number(item.id) > maxId) {
+        maxId = Number(item.id);
       }
-    };
+    });
 
-    getAllDiary();
+    idRef.current = maxId + 1;
+
+    dispatch({
+      type: "INIT",
+      data: parsedData,
+    });
+    setIsLoading(false);
   }, []);
 
   // 새로운 일기 추가
-  const onCreate = async (createdDate, emotionId, content) => {
-    if (!createdDate.trim() || !content.trim()) return;
-    const diaryData = {
-      createdDate : new Date(createdDate).toISOString(),
-      emotionId: emotionId,
-      content: content,
-    };
-
-    console.log(createdDate);
-
-    try {
-      const response = await fetch('http://localhost:8080/diary', {
-        method: "POST",
-        body: JSON.stringify(diaryData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const resData = response;
-
-      dispatch({
-        type: "CREATE",
-        data: resData,
-      });
-
-    } catch (err) {
-      console.log("save fail: ", err);
-    }
+  const onCreate = (createdDate, emotionId, content) => {
+    dispatch({
+      type: "CREATE",
+      data: {
+        id: idRef.current++,
+        createdDate,
+        emotionId,
+        content,
+      },
+    });
   };
 
   // 기존 일기 수정
-  const onUpdate = async (id, createdDate, emotionId, content) => {
-    const updateDiary = {
-      id,
-      createdDate: new Date(createdDate).toISOString(),
-      emotionId: emotionId,
-      content: content,
-    }
-
-    try {
-      const response = await fetch(`http://localhost:8080/diary/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(updateDiary),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if(!response.ok) {
-        throw new Error("update fail");
+  const onUpdate = (id, createdDate, emotionId, content) => {
+    dispatch({
+      type: "UPDATE",
+      data: {
+        id,
+        createdDate,
+        emotionId,
+        content,
       }
-
-      const resData = await response.json();
-
-      dispatch({
-        type: "UPDATE",
-        data: {
-          id,
-          emotionId: content,
-        }
-      });
-
-    } catch(error) {
-      console.error("update request fail: ", error);
-    } finally {
-      console.error("update emotionId: ", emotionId);
-      console.error("update content: ", content);
-    }
+    })
   };
 
   // 기존 일기 삭제
-  const onDelete = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:8080/diary/${id}`, {
-        method: "DELETE",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to fetch diary data");
-      }
-      
-      dispatch({
-        type: "DELETE",
-        id,
-      });
-      
-    } catch (error) {
-      console.error("Error fetching diaries:", error);
-    }
+  const onDelete = (id) => {
+    dispatch({
+      type: "DELETE",
+      id,
+    })
   };
 
   if(isLoading) {
@@ -171,7 +130,7 @@ function App() {
   return (
     <>
       <DiaryStateContext.Provider value={data}>
-        <DiaryDispatchContext.Provider
+        <DiaryDisPatchContext.Provider
           value={{
             onCreate,
             onUpdate,
@@ -184,7 +143,7 @@ function App() {
             <Route path="/edit/:id" element={<Edit />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </DiaryDispatchContext.Provider>
+        </DiaryDisPatchContext.Provider>
       </DiaryStateContext.Provider>
     </>
   );

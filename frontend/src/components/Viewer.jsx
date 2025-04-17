@@ -1,15 +1,16 @@
 import "./Viewer.css";
-import { getEmotionImage } from "../utils/get-emotion-images";
-import { emotionList } from "../utils/constants";
+import { getEmotionImage } from "../util/get-emotion-image";
+import { emotionList } from "../util/constants";
 
 const Viewer = ({emotionId, content}) => {
-    const emotionItem = emotionList.find((item) => item.emotionId === emotionId);
+
+    const emotionItem = emotionList.find((item) => String(item.emotionId) === String(emotionId));
 
     return (
         <div className="Viewer">
             <section className="img_section">
                 <h4>오늘의 감정</h4>
-                <div className={`emotion_img_wrapper emotion_img_wrapper_${emotionItem.emotionId}`}>
+                <div className={`emotion_img_wrapper emotion_img_wrapper_${emotionId}`}>
                     <img src={getEmotionImage(emotionId)} />
                     <div>
                         {emotionItem.emotionName}
@@ -24,6 +25,6 @@ const Viewer = ({emotionId, content}) => {
             </section>
         </div>
     );
-};
+}
 
 export default Viewer;

@@ -1,3 +1,4 @@
+// import { useSearchParams } from "react-router-dom";
 import { useState, useContext } from "react";
 import { DiaryStateContext } from "../App";
 
@@ -7,32 +8,29 @@ import DiaryList from "../components/DiaryList";
 import usePageTitle from "../hooks/usePageTitle";
 
 const getMonthlyData = (pivotDate, data) => {
+                            // (년도, 월, 그달의 시작날인 1일, 0시, 0분, 0초)
     const beginTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth(), 1, 0, 0, 0).getTime();
+                            // (년도, 월, 그달의 시작날인 그달의 끝날짜, 23시, 59분, 59초)
     const endTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1, 0, 23, 59, 59).getTime();
 
-    const diaryData = data.filter((diary) => {
-      
-        // 날짜 비교 (createdDate가 문자열이면 Date 객체로 바꿔줘야 해)
-        const diaryDate = new Date(diary.createdDate);
-        return beginTime <= diaryDate && diaryDate <= endTime;
-    });
-      
-    return diaryData;
+    return data.filter((item) => beginTime <= item.createdDate && item.createdDate <= endTime);
 };
 
 const Home = () => {
+    // 동적경로방식 query string 으로 파라미터 불러오기(?뒤에 변수명과 값 명시): /?value=hello
+    // const [params, setParams] = useSearchParams();
+    // console.log(params.get("value"));
+
     const data = useContext(DiaryStateContext);
     const [pivotDate, setPivotDate] = useState(new Date());
-    const monthlyData = getMonthlyData(pivotDate, data);
 
     usePageTitle("감정 일기장");
-
-    //console.log("monthlyData : " + monthlyData);
+    
+    const monthlyData = getMonthlyData(pivotDate, data);
 
     const onIncreseMonth = () => {
         setPivotDate(new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1));
     }
-
     const onDecreaseMonth = () => {
         setPivotDate(new Date(pivotDate.getFullYear(), pivotDate.getMonth() - 1));
     }
@@ -41,8 +39,8 @@ const Home = () => {
         <div>
             <Header
                 title={`${pivotDate.getFullYear()}년 ${pivotDate.getMonth() + 1}월`}
-                leftChild={<Button onClick={onDecreaseMonth} text={"<"} />}
-                rightChild={<Button onClick={onIncreseMonth} text={">"} />}
+                leftChild={<Button onClick={onDecreaseMonth} text={"<"}/>}
+                rightChild={<Button onClick={onIncreseMonth} text={">"}/>}
             />
             <DiaryList data={monthlyData} />
         </div>

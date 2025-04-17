@@ -1,15 +1,13 @@
 .Header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 20px 0px;
     border-bottom: 1px solid rgb(226, 226, 226);
-    font-size: 27px;
 }
 
 .Header > div {
     display: flex;
-} 
+}
 
 .Header .header_center {
     width: 50%;
