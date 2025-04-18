@@ -39,8 +39,6 @@ public class DiaryController {
             diary.setCreatedDate(LocalDateTime.of(dateOnly, nowTime));
         }
 
-        System.out.println("created date ==> " + diary.getCreatedDate());
-
         diaryMapper.saveDiary(diary);
         Diary createdDiary = diaryMapper.findDiaryById(diary.getId());
 
