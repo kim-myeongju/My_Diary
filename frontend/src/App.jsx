@@ -1,5 +1,5 @@
 import './App.css';
-import { useReducer, useRef, createContext, useEffect, useState } from 'react';
+import { useReducer, createContext, useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import New from './pages/New';
@@ -36,7 +36,7 @@ function reducer(state, action) {
       return state;
   }
 
-  localStorage.setItem("diary", JSON.stringify(nextState));
+  // localStorage.setItem("diary", JSON.stringify(nextState));
 
   return nextState;
 }
@@ -49,81 +49,103 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, dispatch] = useReducer(reducer, []);
 
-  // ** 백엔드 연동되면 삭제하기
-  const idRef = useRef(3);
-
-  // localStorage.setItem("test", 'hello');
-  // localStorage.setItem("person", JSON.stringify({name: "송혜교"}));
-
-  // const test = localStorage.getItem("test");
-  // console.log(test);
-  // const person = localStorage.getItem("person");
-  // console.log(JSON.parse(person));
-
-  // localStorage.removeItem("test");
-  // localStorage.removeItem("person");   // 브라우저 어플리케이션에서 삭제할 데이터를 클릭하고 backspace 눌러도 삭제
-
   useEffect(() => {
-    const storedData = localStorage.getItem("diary");
-    if(!storedData) { // storedData가 undefined라면 리턴 !
-      return ;
-    }
-    const parsedData = JSON.parse(storedData);
+    const storedData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/diary");
+        if(!response.ok) {
+          throw new Error("서버 응답 오류");
+        }
 
-    if(!Array.isArray(parsedData)) {
-      setIsLoading(false);
-      return ;
-    }
+        const data = await response.json();
 
-    // ** 백엔드 연동되면 삭제하기
-    let maxId = 0;
-    parsedData.forEach((item) => {
-      if(Number(item.id) > maxId) {
-        maxId = Number(item.id);
+        if(!Array.isArray(data)) {
+          setIsLoading(false);
+          return;
+        }
+
+        dispatch({
+          type: "INIT",
+          data: data,
+        });
+      } catch(error) {
+        console.error("일기 데이터 불러오기 실패: ", error);
+      } finally {
+        setIsLoading(false);
       }
-    });
-    idRef.current = maxId + 1;
+    };
 
-    dispatch({
-      type: "INIT",
-      data: parsedData,
-    });
-    setIsLoading(false);
+    storedData();
   }, []);
 
   // 새로운 일기 추가
-  const onCreate = (createdDate, emotionId, content) => {
-    dispatch({
-      type: "CREATE",
-      data: {
-        id: idRef.current++,
-        createdDate,
-        emotionId,
-        content,
-      },
-    });
+  const onCreate = async (createdDate, emotionId, content) => {
+    const newDiary = {
+      createdDate: new Date(createdDate).toISOString(),
+      emotionId,
+      content,
+    };
+
+    console.log("onCreate: ", newDiary);
+
+    try {
+      const response = await fetch("http://localhost:8080/diary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newDiary),
+      });
+
+      if(!response.ok) {
+        throw new Error("서버 응답 실패");
+      }
+
+      const saveDiary = await response.json();
+
+      if(saveDiary.msg === "save success") {
+        const diariesLatest = await fetch("http://localhost:8080/diary/latest");
+        if(!diariesLatest.ok) {
+          throw new Error("일기 목록 불러오기 실패");
+        }
+
+        const diaries = await diariesLatest.json();
+        if(Array.isArray(diaries)) {
+          dispatch({
+            type: "INIT",
+            data: diaries,
+          });
+        } else {
+          console.error("불러온 데이터가 예상과 다릅니다.");
+        }
+      } else {
+        console.error("일기 저장 실패: ", saveDiary.msg);
+      };
+    } catch (error) {
+      console.error("일기 저장 실패: ", error);
+    }
   };
 
   // 기존 일기 수정
-  const onUpdate = (id, createdDate, emotionId, content) => {
-    dispatch({
-      type: "UPDATE",
-      data: {
-        id,
-        createdDate,
-        emotionId,
-        content,
-      }
-    })
-  };
+  // const onUpdate = (id, createdDate, emotionId, content) => {
+  //   dispatch({
+  //     type: "UPDATE",
+  //     data: {
+  //       id,
+  //       createdDate,
+  //       emotionId,
+  //       content,
+  //     }
+  //   })
+  // };
 
   // 기존 일기 삭제
-  const onDelete = (id) => {
-    dispatch({
-      type: "DELETE",
-      id,
-    })
-  };
+  // const onDelete = (id) => {
+  //   dispatch({
+  //     type: "DELETE",
+  //     id,
+  //   })
+  // };
 
   if(isLoading) {
     return <div>데이터 로딩중입니다...!!!^^</div>;
@@ -135,8 +157,8 @@ function App() {
         <DiaryDisPatchContext.Provider
           value={{
             onCreate,
-            onUpdate,
-            onDelete,
+            // onUpdate,
+            // onDelete,
           }}>
           <Routes>
             <Route path="/" element={<Home />} />

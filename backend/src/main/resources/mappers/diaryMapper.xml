@@ -14,11 +14,6 @@
         select * from mydiary order by created_date desc
     </select>
 
-    <!-- 오래된순 -->
-    <select id="findAllDiary" resultType="diary">
-        select * from mydiary order by created_date
-    </select>
-
     <select id="findDiaryById" resultType="diary">
         select * from mydiary where id = #{id}
     </select>

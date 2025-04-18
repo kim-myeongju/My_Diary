@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -17,11 +20,13 @@ public class DiaryController {
 
     // 일기 추가
     @PostMapping
-    public ResponseEntity<String> save(@RequestBody Diary diary) {
+    public ResponseEntity<Map<String, String>> save(@RequestBody Diary diary) {
         System.out.println("diary data ==> " + diary);
 
         if (diary == null) {
-            return ResponseEntity.status(400).body("save fail");
+            Map<String,String> response = new HashMap<>();
+            response.put("msg", "save fail");
+            return ResponseEntity.status(400).body(response);
         }
 
         // createdDate가 null이면 현재 날짜로 설정
@@ -31,7 +36,10 @@ public class DiaryController {
 
         diaryMapper.saveDiary(diary);
 
-        return ResponseEntity.ok("save success");
+        Map<String,String> response = new HashMap<>();
+        response.put("msg", "save success");
+
+        return ResponseEntity.ok(response);
     }
 
 //    @GetMapping("/test")
@@ -50,16 +58,9 @@ public class DiaryController {
 //    }
 
     // 일기 최신순으로 정렬
-    @GetMapping("/latest")
+    @GetMapping
     public ResponseEntity<List<Diary>> getDiaryListLatest() {
         List<Diary> allDiary = diaryMapper.findAllDiaryDesc();
-        return ResponseEntity.ok(allDiary);
-    }
-
-    // 일기 오래된순으로 정렬
-    @GetMapping("/oldest")
-    public ResponseEntity<List<Diary>> getDiaryListOldest() {
-        List<Diary> allDiary = diaryMapper.findAllDiary();
         return ResponseEntity.ok(allDiary);
     }
 

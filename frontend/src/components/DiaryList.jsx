@@ -2,9 +2,10 @@ import "./DiaryList.css";
 import Button from "./Button";
 import DiaryItem from "./DiaryItem";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
-const DiaryList = ({data}) => {
+const DiaryList = ({ data }) => {
+
     const nav = useNavigate();
     const [sortType, setSortType] = useState("latest");
 
@@ -12,19 +13,15 @@ const DiaryList = ({data}) => {
         setSortType(e.target.value);
     };
 
-    
-    const getSortedDate = () => {
-        return data.toSorted((a, b) => {
-            if(sortType === 'oldest') {
-                // ** 이 부분도 백엔드 쪽에 정렬 쿼리 만든 메퍼 적용해서 구현완료되면 계산식은 삭제할 부분 - 리턴으로 백엔드 쪽 정보 리턴하도록??
-                return Number(a.createdDate) - Number(b.createdDate);
+    const sortedData = useMemo(() => {
+        return data.slice().sort((a, b) => {
+            if (sortType === "oldest") {
+                return new Date(a.createdDate) - new Date(b.createdDate); // 오래된 순
             } else {
-                // ** 이 부분도 백엔드 쪽에 정렬 쿼리 만든 메퍼 적용해서 구현완료되면 계산식은 삭제할 부분 - 리턴으로 백엔드 쪽 정보 리턴하도록??
-                return Number(b.createdDate) - Number(a.createdDate);
+                return new Date(b.createdDate) - new Date(a.createdDate); // 최신순
             }
         });
-    };
-    const sortData = getSortedDate();
+    }, [data, sortType]);
 
     return (
         <div className="DiaryList">
@@ -36,7 +33,11 @@ const DiaryList = ({data}) => {
                 <Button onClick={()=>nav("/new")} text={"새 일기 쓰기"} type={"POSITIVE"} />
             </div>
             <div className="list_wrapper">
-                {sortData.map((item)=><DiaryItem key={item.id} {...item}     />)}
+                {sortedData.length === 0 ? (
+                    <p>일기가 없습니다.</p>
+                ) : (
+                    sortedData.map((item) => <DiaryItem key={item.id} {...item} />)
+                )}
             </div>
         </div>
     );
