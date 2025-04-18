@@ -2,7 +2,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import Editor from "../components/Editor";
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useContext} from "react";
 import { DiaryDisPatchContext } from "../App";
 import usePageTitle from "../hooks/usePageTitle";
 

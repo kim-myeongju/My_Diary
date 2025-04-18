@@ -20,15 +20,12 @@ const Editor = ({ initData, onSubmit }) => {
         if(initData) {
             setInput({
                 ...initData,
-                createdDate: new Date(Number(initData.createdDate)),
+                createdDate: new Date(initData.createdDate),
             })
         }
     }, [initData]);
 
     const onChangeInput = (e) => {
-        // console.log(e.target.name);     // 어떤 요소에 입력이 들어온건지
-        // console.log(e.target.value);    // 입력된 값이 무엇인지?
-
         let name = e.target.name;
         let value = e.target.value;
 

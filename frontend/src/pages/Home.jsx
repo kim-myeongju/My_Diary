@@ -10,21 +10,24 @@ import usePageTitle from "../hooks/usePageTitle";
 // 해당 달에 작성된 일기들만 정렬
 const getMonthlyData = (pivotDate, data) => {
                             // (년도, 월, 그달의 시작날인 1일, 0시, 0분, 0초)
-    const beginTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth(), 1, 0, 0, 0).getTime();
+    // const beginTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth(), 1, 0, 0, 0).getTime();
+    const beginTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth(), 1).getTime();
                             // (년도, 월, 그달의 시작날인 그달의 끝날짜, 23시, 59분, 59초)
     const endTime = new Date(pivotDate.getFullYear(), pivotDate.getMonth() + 1, 0, 23, 59, 59).getTime();
 
     return data.filter((item) => {
-        const itemTime = new Date(item.createdDate).getTime();
+        const created = new Date(item.createdDate);
+        if(isNaN(created.getTime())) {
+            console.warn("잘못된 날짜: ", item.createdDate);
+            return false;
+        }
+        // const itemTime = new Date(item.createdDate).getTime();
+        const itemTime = created.getTime();
         return beginTime <= itemTime && itemTime <= endTime;
     });
 };
 
 const Home = () => {
-    // 동적경로방식 query string 으로 파라미터 불러오기(?뒤에 변수명과 값 명시): /?value=hello
-    // const [params, setParams] = useSearchParams();
-    // console.log(params.get("value"));
-
     const data = useContext(DiaryStateContext);
     const [pivotDate, setPivotDate] = useState(new Date());
 

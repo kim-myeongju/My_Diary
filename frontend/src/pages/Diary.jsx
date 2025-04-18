@@ -7,7 +7,6 @@ import {getStringDate} from "../util/get-string-date";
 import usePageTitle from "../hooks/usePageTitle";
 
 const Diary = () => {
-    // 동적경로방식 URL Parameter(/뒤에 아이템의 id를 명시): ~/diary/1, ~/diary/2, ~/diary/3
     const params = useParams();
     const nav = useNavigate();
 

@@ -21,22 +21,17 @@ function reducer(state, action) {
       nextState = [action.data, ...state];
       break;
     }
-      // return [action.data, ...state];
     case "UPDATE": {
       nextState = state.map((item) => String(item.id) === String(action.data.id)? action.data : item);
       break;
     }
-      // return state.map((item) => String(item.id) === String(action.data.id)? action.data : item);
     case "DELETE": {
       nextState = state.filter((item) => String(item.id) !== String(action.id));
       break;
     }
-      // return state.filter((item) => String(item.id) !== String(action.id));
     default: 
       return state;
   }
-
-  // localStorage.setItem("diary", JSON.stringify(nextState));
 
   return nextState;
 }
@@ -53,11 +48,12 @@ function App() {
     const storedData = async () => {
       try {
         const response = await fetch("http://localhost:8080/diary");
+
         if(!response.ok) {
-          throw new Error("서버 응답 오류");
+          throw new Error('서버 연결 실패');
         }
 
-        const data = await response.json();
+        const allData = await response.json();
 
         if(!Array.isArray(data)) {
           setIsLoading(false);
@@ -66,7 +62,7 @@ function App() {
 
         dispatch({
           type: "INIT",
-          data: data,
+          data: allData,
         });
       } catch(error) {
         console.error("일기 데이터 불러오기 실패: ", error);
@@ -80,72 +76,89 @@ function App() {
 
   // 새로운 일기 추가
   const onCreate = async (createdDate, emotionId, content) => {
-    const newDiary = {
+    
+    const nowData = {
       createdDate: new Date(createdDate).toISOString(),
       emotionId,
       content,
     };
 
-    console.log("onCreate: ", newDiary);
-
     try {
-      const response = await fetch("http://localhost:8080/diary", {
-        method: "POST",
+      const response = await fetch('http://localhost:8080/diary', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newDiary),
+        body: JSON.stringify(nowData),
       });
 
-      if(!response.ok) {
-        throw new Error("서버 응답 실패");
+      if (!response.ok) {
+        throw new Error('서버 연결 실패');
       }
 
-      const saveDiary = await response.json();
+      const createdDiary = await response.json();
 
-      if(saveDiary.msg === "save success") {
-        const diariesLatest = await fetch("http://localhost:8080/diary/latest");
-        if(!diariesLatest.ok) {
-          throw new Error("일기 목록 불러오기 실패");
-        }
-
-        const diaries = await diariesLatest.json();
-        if(Array.isArray(diaries)) {
-          dispatch({
-            type: "INIT",
-            data: diaries,
-          });
-        } else {
-          console.error("불러온 데이터가 예상과 다릅니다.");
-        }
-      } else {
-        console.error("일기 저장 실패: ", saveDiary.msg);
-      };
+      dispatch({
+        type: "CREATE",
+        data: createdDiary,
+      });
     } catch (error) {
-      console.error("일기 저장 실패: ", error);
+      console.log("일기 저장 실패: ", error);
     }
   };
 
   // 기존 일기 수정
-  // const onUpdate = (id, createdDate, emotionId, content) => {
-  //   dispatch({
-  //     type: "UPDATE",
-  //     data: {
-  //       id,
-  //       createdDate,
-  //       emotionId,
-  //       content,
-  //     }
-  //   })
-  // };
+  const onUpdate = async (id, createdDate, emotionId, content) => {
+    
+    const nowData = {
+      createdDate: new Date(createdDate).toISOString(),
+      emotionId,
+      content,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:8080/diary/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nowData),
+      });
+
+      if (!response.ok) {
+        throw new Error('서버 연결 실패');
+      }
+
+      const updatedDiary = await response.json();
+
+      dispatch({
+        type: "UPDATE",
+        data: updatedDiary,
+      });
+    } catch (error) {
+      console.log("일기 수정 실패: ", error);
+    }
+  };
 
   // 기존 일기 삭제
-  // const onDelete = (id) => {
-  //   dispatch({
-  //     type: "DELETE",
-  //     id,
-  //   })
-  // };
+  const onDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/diary/${id}`, {
+        method: 'DELETE',
+      });
+
+      if(!response.ok) {
+        throw new Error('서버 연결 실패');
+      }
+
+      dispatch({
+        type: "DELETE",
+        id,
+      });
+    } catch (error) {
+      console.log("일기 삭제 실패: ", error);
+    }
+  };
 
   if(isLoading) {
     return <div>데이터 로딩중입니다...!!!^^</div>;
@@ -157,8 +170,8 @@ function App() {
         <DiaryDisPatchContext.Provider
           value={{
             onCreate,
-            // onUpdate,
-            // onDelete,
+            onUpdate,
+            onDelete,
           }}>
           <Routes>
             <Route path="/" element={<Home />} />

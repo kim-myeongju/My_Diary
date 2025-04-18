@@ -16,9 +16,9 @@ const DiaryList = ({ data }) => {
     const sortedData = useMemo(() => {
         return data.slice().sort((a, b) => {
             if (sortType === "oldest") {
-                return new Date(a.createdDate) - new Date(b.createdDate); // 오래된 순
+                return new Date(a.createdDate) - new Date(b.createdDate);
             } else {
-                return new Date(b.createdDate) - new Date(a.createdDate); // 최신순
+                return new Date(b.createdDate) - new Date(a.createdDate);
             }
         });
     }, [data, sortType]);
@@ -32,12 +32,15 @@ const DiaryList = ({ data }) => {
                 </select>
                 <Button onClick={()=>nav("/new")} text={"새 일기 쓰기"} type={"POSITIVE"} />
             </div>
-            <div className="list_wrapper">
+            {/* <div className="list_wrapper">
                 {sortedData.length === 0 ? (
                     <p>일기가 없습니다.</p>
                 ) : (
                     sortedData.map((item) => <DiaryItem key={item.id} {...item} />)
                 )}
+            </div> */}
+            <div className="list_wrapper">
+                {sortedData.map((item) => <DiaryItem key={item.id} {...item} />)}
             </div>
         </div>
     );
