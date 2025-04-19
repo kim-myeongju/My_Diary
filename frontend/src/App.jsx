@@ -78,10 +78,12 @@ function App() {
   const onCreate = async (createdDate, emotionId, content) => {
     
     const nowData = {
-      createdDate: new Date(createdDate).toISOString(),
+      createdDate,
       emotionId,
       content,
     };
+
+    console.log("createdDate = " ,createdDate);
 
     try {
       const response = await fetch('http://localhost:8080/diary', {
@@ -111,7 +113,7 @@ function App() {
   const onUpdate = async (id, createdDate, emotionId, content) => {
     
     const nowData = {
-      createdDate: new Date(createdDate).toISOString(),
+      createdDate,
       emotionId,
       content,
     };

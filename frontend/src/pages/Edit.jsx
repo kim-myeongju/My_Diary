@@ -24,7 +24,7 @@ const Edit = () => {
 
     const onSubmit = (input) => {
         if(window.confirm("일기를 정말 수정하시겠습니까...?")) {
-            onUpdate(params.id, input.createdDate.getTime(), input.emotionId, input.content);
+            onUpdate(params.id, input.createdDate, input.emotionId, input.content);
             nav("/", {replace: true});
         }
     };
