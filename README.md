@@ -1,6 +1,6 @@
 # React Study
 
-🪄일기장(Diary) 만들기🪄
+📅일기장(Diary) 만들기
 
 frondend: JavaScript + React + HTML + CSS
 
